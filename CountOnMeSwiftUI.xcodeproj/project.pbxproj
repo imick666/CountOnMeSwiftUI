@@ -97,6 +97,7 @@
 			children = (
 				E067173825C5C58B00600FF3 /* CountOnMeSwiftUIApp.swift */,
 				E067173A25C5C58B00600FF3 /* ContentView.swift */,
+				E067176625C6CE5200600FF3 /* Model */,
 				E067173C25C5C58C00600FF3 /* Assets.xcassets */,
 				E067174125C5C58C00600FF3 /* Info.plist */,
 				E067173E25C5C58C00600FF3 /* Preview Content */,
@@ -128,6 +129,13 @@
 				E067175725C5C58C00600FF3 /* Info.plist */,
 			);
 			path = CountOnMeSwiftUIUITests;
+			sourceTree = "<group>";
+		};
+		E067176625C6CE5200600FF3 /* Model */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Model;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
