@@ -52,5 +52,12 @@ class CountOnMeSwiftUITests: XCTestCase {
         
         XCTAssertEqual(env?.display, "5")
     }
+    
+    func testAddMinusToOne() {
+        env?.pressedButton(.one)
+        env?.pressedButton(.plusMinus)
+        
+        XCTAssertEqual(env?.display, "-1")
+    }
 
 }

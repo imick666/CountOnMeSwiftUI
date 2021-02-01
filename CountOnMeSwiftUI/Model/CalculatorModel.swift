@@ -7,16 +7,22 @@
 
 import Foundation
 
-class CalculatorModel: ObservableObject {
+final class CalculatorModel: ObservableObject {
     
     // MARK: - Properties
     
-    @Published var display: String?
+    @Published private(set) var display: String = "0"
+    @Published private(set) var errorMessage: String?
+    @Published var errorHasAppend = false
     
     private var numberFormatter = NumberFormatter()
     
     private var calculDisplay: [String] {
-        return display?.components(separatedBy: " ").map({$0.replacingOccurrences(of: ",", with: ".")}) ?? []
+            return display.components(separatedBy: " ").map({$0.replacingOccurrences(of: ",", with: ".")})
+    }
+    
+    private var lastNumberIsNegative: Bool {
+        return calculDisplay.last?.starts(with: "-") ?? false
     }
     
     private var operatorHasBeenPress: Bool {
@@ -29,7 +35,7 @@ class CalculatorModel: ObservableObject {
     }
     
     private var calculIsEmpty: Bool {
-        return calculDisplay.isEmpty
+        return calculDisplay.count == 1 && calculDisplay.first == "0"
     }
     
     
@@ -40,8 +46,15 @@ class CalculatorModel: ObservableObject {
         case .number: numberHasBeenPress(button)
         case .equal: pressedEqualdButton()
         case .oper: operatorHasBeenPress(button)
-        case .clear: display = nil
-        default: return
+        case .clear: resetCalcul()
+        case .other: otherTouchHasBeenPress(button)
+        }
+    }
+    
+    private func otherTouchHasBeenPress(_ button: CalculatorButton) {
+        if button == .plusMinus {
+            errorHasAppend.toggle()
+            errorMessage = "Oops il y a eu une erreur"
         }
     }
     
@@ -79,7 +92,7 @@ class CalculatorModel: ObservableObject {
         numberFormatter.decimalSeparator = ","
         numberFormatter.numberStyle = .decimal
         
-        display = numberFormatter.string(for: result)
+        display = numberFormatter.string(for: result)!
     }
     
     private func calculate(left: String, operand: String, right: String) -> Double {
@@ -96,25 +109,28 @@ class CalculatorModel: ObservableObject {
     }
     
     private func numberHasBeenPress(_ button: CalculatorButton) {
-        if display == nil {
+        if calculIsEmpty {
             if button == .decimal {
-                display = "0,"
+                display.append(",")
                 return
             }
             display = button.title
         } else {
             guard !operatorHasBeenPress else {
-                display?.append(" \(button.title)")
+                display.append(" \(button.title)")
                 return
             }
-            display?.append(button.title)
+            display.append(button.title)
         }
     }
     
     private func operatorHasBeenPress(_ button: CalculatorButton) {
         if canAddOperator {
-            display?.append(" \(button.title)")
+            display.append(" \(button.title)")
         }
     }
     
+    private func resetCalcul() {
+        display = "0"
+    }
 }

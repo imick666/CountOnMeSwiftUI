@@ -12,6 +12,9 @@ struct ContentView: View {
     // MARK: - Properties
     
     @EnvironmentObject var env: CalculatorModel
+    var alertIsShow: Bool {
+        return env.errorHasAppend
+    }
     
     let buttonList: [[CalculatorButton]] = [
         [.ac, .plusMinus, .percent, .divide],
@@ -28,7 +31,7 @@ struct ContentView: View {
             Spacer()
             HStack {
                 Spacer()
-                Text(env.display ?? "0")
+                Text(env.display)
                     .foregroundColor(.white)
                     .font(.system(size: 48))
                     .padding()
@@ -46,6 +49,9 @@ struct ContentView: View {
         }
         .padding()
         .background(Color.black.edgesIgnoringSafeArea(.all))
+        .alert(isPresented: $env.errorHasAppend, content: {
+            Alert(title: Text("Error"), message: Text(env.errorMessage!), dismissButton: .default(Text("Ok")))
+        })
     }
 }
 
