@@ -18,11 +18,7 @@ final class CalculatorModel: ObservableObject {
     private var numberFormatter = NumberFormatter()
     
     private var calculDisplay: [String] {
-            return display.components(separatedBy: " ").map({$0.replacingOccurrences(of: ",", with: ".")})
-    }
-    
-    private var lastNumberIsNegative: Bool {
-        return calculDisplay.last?.starts(with: "-") ?? false
+        return display.split(separator: " ").map({ $0.replacingOccurrences(of: ",", with: ".") })
     }
     
     private var operatorHasBeenPress: Bool {
@@ -36,6 +32,9 @@ final class CalculatorModel: ObservableObject {
     
     private var calculIsEmpty: Bool {
         return calculDisplay.count == 1 && calculDisplay.first == "0"
+    }
+    private var calculeIsCorrect: Bool {
+        return calculDisplay.count >= 3 && !operatorHasBeenPress
     }
     
     
@@ -59,7 +58,12 @@ final class CalculatorModel: ObservableObject {
     }
     
     private func pressedEqualdButton() {
-        guard calculDisplay.count >= 3 && !operatorHasBeenPress else { return }
+        guard calculeIsCorrect else {
+            errorMessage = "Please enter a correct calcul"
+            errorHasAppend.toggle()
+            resetCalcul()
+            return
+        }
         
         var currentCalcul = calculDisplay
         var result: Double  = 0
@@ -111,13 +115,15 @@ final class CalculatorModel: ObservableObject {
     private func numberHasBeenPress(_ button: CalculatorButton) {
         if calculIsEmpty {
             if button == .decimal {
-                display.append(",")
+                display.append(button.title)
                 return
             }
             display = button.title
         } else {
-            guard !operatorHasBeenPress else {
-                display.append(" \(button.title)")
+            guard calculDisplay.last != "/" && button != .zero else {
+                errorMessage = "You can't divide by zero"
+                errorHasAppend.toggle()
+                resetCalcul()
                 return
             }
             display.append(button.title)
@@ -126,7 +132,7 @@ final class CalculatorModel: ObservableObject {
     
     private func operatorHasBeenPress(_ button: CalculatorButton) {
         if canAddOperator {
-            display.append(" \(button.title)")
+            display.append(" \(button.title) ")
         }
     }
     
