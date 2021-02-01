@@ -9,6 +9,8 @@ import SwiftUI
 
 struct ContentView: View {
     
+    // MARK: - Properties
+    
     @EnvironmentObject var env: CalculatorModel
     
     let buttonList: [[CalculatorButton]] = [
@@ -18,6 +20,8 @@ struct ContentView: View {
         [.one, .two, .three, .plus],
         [.zero, .decimal, .equal]
     ]
+    
+    // MARK: - Body
     
     var body: some View {
         VStack(spacing: 10) {

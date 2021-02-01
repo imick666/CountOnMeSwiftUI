@@ -22,13 +22,15 @@ class CountOnMeSwiftUITests: XCTestCase {
         super.tearDown()
     }
 
-    func testTwoPlusTwo() {
+    func testTwoDotTwoPlusTwo() {
+        env?.pressedButton(.two)
+        env?.pressedButton(.decimal)
         env?.pressedButton(.two)
         env?.pressedButton(.plus)
         env?.pressedButton(.two)
         env?.pressedButton(.equal)
         
-        XCTAssertEqual(env?.display, "4,0")
+        XCTAssertEqual(env?.display, "4,2")
     }
     
     func testTwoMultiplyByThree() {
@@ -37,7 +39,18 @@ class CountOnMeSwiftUITests: XCTestCase {
         env?.pressedButton(.three)
         env?.pressedButton(.equal)
         
-        XCTAssertEqual(env?.display, "6,0")
+        XCTAssertEqual(env?.display, "6")
+    }
+    
+    func testOnePlusTwoMultiplyByTwo() {
+        env?.pressedButton(.one)
+        env?.pressedButton(.plus)
+        env?.pressedButton(.two)
+        env?.pressedButton(.multiply)
+        env?.pressedButton(.two)
+        env?.pressedButton(.equal)
+        
+        XCTAssertEqual(env?.display, "5")
     }
 
 }

@@ -8,8 +8,13 @@
 import SwiftUI
 
 struct CalculatorButtonView: View {
+    
+    // MARK: - Properties
+    
     var button: CalculatorButton
     var action: () -> Void
+    
+    // MARK: - Body
     
     var body: some View {
         Button(action: {
@@ -23,6 +28,8 @@ struct CalculatorButtonView: View {
                 .clipShape(Capsule())
         })
     }
+    
+    // MARK: - Methodes
     
     private func getButtonSize(button: CalculatorButton) -> CGRect {
         var height: CGFloat {
