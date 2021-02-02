@@ -27,7 +27,7 @@ final class CalculatorModel: ObservableObject {
     }
     
     private var canAddOperator: Bool {
-        return calculDisplay.count > 0 && !operatorHasBeenPress
+        return calculDisplay.count > 0 && !operatorHasBeenPress && display != "0"
     }
     
     private var calculIsEmpty: Bool {
@@ -55,6 +55,9 @@ final class CalculatorModel: ObservableObject {
             errorHasAppend.toggle()
             errorMessage = "Oops il y a eu une erreur"
         }
+        if button == .percent {
+            operatorHasBeenPress(button)
+        }
     }
     
     private func pressedEqualdButton() {
@@ -81,6 +84,24 @@ final class CalculatorModel: ObservableObject {
             currentCalcul.remove(at: index - 1)
         }
         
+        while currentCalcul.contains("%") {
+            guard let percentIndex = currentCalcul.firstIndex(of: "%") else { return }
+            let index = percentIndex - 2
+            let left = currentCalcul[index - 1]
+            let operand = currentCalcul[index]
+            let right = currentCalcul[index + 1]
+            
+            let percentage = calculate(left: left, operand: "%", right: right)
+            
+            result = calculate(left: left, operand: operand, right: String(percentage))
+            
+            currentCalcul[index] = "\(result)"
+            currentCalcul.remove(at: index + 2)
+            currentCalcul.remove(at: index + 1)
+            currentCalcul.remove(at: index - 1)
+            
+        }
+        
         while currentCalcul.count > 1 {
             let left = currentCalcul[0]
             let operand = currentCalcul[1]
@@ -101,13 +122,14 @@ final class CalculatorModel: ObservableObject {
     
     private func calculate(left: String, operand: String, right: String) -> Double {
         guard let left = Double(left) else { return Double() }
-        guard let right = Double(right) else { return Double () }
+        guard let right = Double(right) else { return Double() }
         
         switch operand {
         case "+": return left + right
         case "-": return left - right
         case "X": return left * right
         case "/": return left / right
+        case "%": return left * (right / 100)
         default: return Double()
         }
     }
@@ -120,7 +142,7 @@ final class CalculatorModel: ObservableObject {
             }
             display = button.title
         } else {
-            guard calculDisplay.last != "/" && button != .zero else {
+            guard !(calculDisplay.last == "/" && button == .zero) else {
                 errorMessage = "You can't divide by zero"
                 errorHasAppend.toggle()
                 resetCalcul()
@@ -131,9 +153,8 @@ final class CalculatorModel: ObservableObject {
     }
     
     private func operatorHasBeenPress(_ button: CalculatorButton) {
-        if canAddOperator {
-            display.append(" \(button.title) ")
-        }
+        guard canAddOperator else { return }
+        display.append(" \(button.title) ")
     }
     
     private func resetCalcul() {
