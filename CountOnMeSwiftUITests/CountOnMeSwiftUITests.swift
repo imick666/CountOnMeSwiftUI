@@ -112,6 +112,35 @@ class CountOnMeSwiftUITests: XCTestCase {
         XCTAssertEqual(env?.display, "200")
     }
     
+    func testPressPlusMinusWithZeroAndRevefrt() {
+        env?.pressedButton(.plusMinus)
+        
+        XCTAssertEqual(env?.display, "-")
+        
+        env?.pressedButton(.plusMinus)
+        
+        XCTAssertEqual(env?.display, "0")
+    }
+    
+    func testPlusMinusAfterOperand() {
+        env?.pressedButton(.two)
+        env?.pressedButton(.plus)
+        env?.pressedButton(.plusMinus)
+        
+        XCTAssertEqual(env?.display, "2 + -")
+    }
+    
+    func testAddAndRemoveMinus() {
+        env?.pressedButton(.two)
+        env?.pressedButton(.plusMinus)
+        
+        XCTAssertEqual(env?.display, "-2")
+        
+        env?.pressedButton(.plusMinus)
+        
+        XCTAssertEqual(env?.display, "2")
+    }
+    
     // MARK: - Error Tests
     
     func testCalculIsIncorrect() {

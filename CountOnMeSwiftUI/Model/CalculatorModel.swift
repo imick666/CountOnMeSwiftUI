@@ -16,16 +16,13 @@ final class CalculatorModel: ObservableObject {
     @Published var errorHasAppend = false
     
     private var numberFormatter = NumberFormatter()
-    
     private var calculDisplay: [String] {
         return display.split(separator: " ").map({ $0.replacingOccurrences(of: ",", with: ".") })
     }
-    
     private var operatorHasBeenPress: Bool {
         return calculDisplay.last == "+" || calculDisplay.last == "-"
             || calculDisplay.last == "X" || calculDisplay.last == "/"
     }
-    
     private var canAddOperator: Bool {
         return calculDisplay.count > 0 && !operatorHasBeenPress && display != "0"
     }
@@ -33,10 +30,14 @@ final class CalculatorModel: ObservableObject {
     private var calculIsEmpty: Bool {
         return calculDisplay.count == 1 && calculDisplay.first == "0"
     }
+    
+    private var calculStartWithMinus: Bool {
+        return calculDisplay.count == 1 && calculDisplay.first == "-"
+    }
+    
     private var calculeIsCorrect: Bool {
         return calculDisplay.count >= 3 && !operatorHasBeenPress
     }
-    
     
     // MARK: - Methodes
     
@@ -52,8 +53,28 @@ final class CalculatorModel: ObservableObject {
     
     private func otherTouchHasBeenPress(_ button: CalculatorButton) {
         if button == .plusMinus {
-            errorHasAppend.toggle()
-            errorMessage = "Oops il y a eu une erreur"
+            if calculIsEmpty {
+                display = "-"
+                return
+            }
+            if calculStartWithMinus {
+                display = "0"
+                return
+            }
+            if operatorHasBeenPress {
+                display.append("-")
+                return
+            }
+            var calculTemp = calculDisplay
+            guard var lastNumber = calculTemp.last else { return }
+            if lastNumber.contains("-") {
+                lastNumber.removeFirst()
+            } else {
+                lastNumber = "-\(lastNumber)"
+            }
+            calculTemp.removeLast()
+            calculTemp.append(lastNumber)
+            display = calculTemp.joined(separator: " ")
         }
         if button == .percent {
             operatorHasBeenPress(button)
@@ -71,19 +92,6 @@ final class CalculatorModel: ObservableObject {
         var currentCalcul = calculDisplay
         var result: Double  = 0
         
-        while currentCalcul.contains("X") || currentCalcul.contains("/") {
-            guard let index = currentCalcul.firstIndex(where: { $0 == "X" || $0 == "/" }) else { return }
-            let left = currentCalcul[index - 1]
-            let operand = currentCalcul[index]
-            let right = currentCalcul[index + 1]
-            
-            result = calculate(left: left, operand: operand, right: right)
-            
-            currentCalcul[index] = "\(result)"
-            currentCalcul.remove(at: index + 1)
-            currentCalcul.remove(at: index - 1)
-        }
-        
         while currentCalcul.contains("%") {
             guard let percentIndex = currentCalcul.firstIndex(of: "%") else { return }
             let index = percentIndex - 2
@@ -100,6 +108,19 @@ final class CalculatorModel: ObservableObject {
             currentCalcul.remove(at: index + 1)
             currentCalcul.remove(at: index - 1)
             
+        }
+        
+        while currentCalcul.contains("X") || currentCalcul.contains("/") {
+            guard let index = currentCalcul.firstIndex(where: { $0 == "X" || $0 == "/" }) else { return }
+            let left = currentCalcul[index - 1]
+            let operand = currentCalcul[index]
+            let right = currentCalcul[index + 1]
+            
+            result = calculate(left: left, operand: operand, right: right)
+            
+            currentCalcul[index] = "\(result)"
+            currentCalcul.remove(at: index + 1)
+            currentCalcul.remove(at: index - 1)
         }
         
         while currentCalcul.count > 1 {
